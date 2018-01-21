@@ -1,3 +1,149 @@
+Include Nat.
+Require Import ZArith.
+Require Import NArith.
+
+
+Lemma even_p : forall n, even n = true -> exists x, n = 2 * x.
+Proof.
+  assert (Main: forall n, (even n = true -> exists x, n = 2 * x) /\
+                  (even (S n) = true -> exists x, S n = 2 * x)).
+  induction n.
+  split.
+  exists 0.
+  simpl.
+  reflexivity.
+  simpl.
+  discriminate.
+  split.
+  intros.
+  apply IHn in H.
+  exact H.
+  intros.
+  destruct IHn as [H' _].
+  simpl even in H.
+  simpl even in H.
+  destruct H'.
+  exact H.
+  exists (x + 1).
+  simpl.
+  intuition.
+  intros.
+  destruct (Main n) as [H' _].
+  apply H'.
+  exact H.
+Qed.
+
+Lemma pred_S_eq : forall (x y : nat), x = S y -> pred x = y.
+Proof.
+intros.
+unfold pred.
+rewrite H.
+reflexivity.
+Qed.
+
+
+
+Fixpoint sum_odd_n (n : nat) : nat :=
+  match n with
+    | 0 => 0
+    | S n => (2 * n + 1) + sum_odd_n n
+  end.
+
+Compute sum_odd_n 4.
+
+Lemma lemma1 : forall (a b : nat), S (a + b) = S a + b.
+Proof.
+intros.
+induction a.
+intuition.
+simpl.
+replace (S (a + b)) with (S a + b).
+reflexivity.
+Qed.
+
+
+Lemma lemma3 : forall (a b : nat), S (a + b) = a + S b.
+Proof.
+intros.
+induction a.
+intuition.
+simpl.
+replace (S (a + b)) with (a + S b).
+reflexivity.
+Qed.
+
+Lemma lemma2 : forall (a b : nat), a * (S b) = a * b + a. 
+Proof.
+intros.
+induction a.
+simpl.
+reflexivity.
+symmetry.
+intuition.
+Qed.
+
+Theorem sum_odd_squares : forall (n : nat), sum_odd_n n = n * n.
+Proof.
+  induction n.
+  simpl.
+  reflexivity.
+  simpl.
+  replace (sum_odd_n n) with (n * n).
+  replace (n + 0) with n.
+  replace (S (n + n* S n)) with (n + 1 + (n * n) + n).
+  intuition.
+  replace (S (n + n * S n)) with (S n + n * S n).
+  replace (S n + n * S n) with (S n + n * n + n).
+  intuition.
+  replace (n * S n) with (n * n + n).
+  intuition.
+  replace (n * S n) with (n * n + n).
+  intuition. 
+  symmetry.
+  apply lemma2.
+  simpl.
+  reflexivity.
+  intuition.
+Qed.
+
+Lemma succ_inj : forall (x y : nat), x = y -> pred x = pred y.
+Proof.
+intros.
+destruct x.
+destruct y.
+unfold pred.
+reflexivity.
+discriminate.
+destruct x.
+rewrite H.
+reflexivity.
+rewrite H.
+reflexivity.
+Qed.
+
+
+SearchPattern (nat -> nat -> bool).
+
+
+Fixpoint upTo (n : nat) : list nat :=
+  match n with
+  | 0 => 0 :: nil
+  | S k => S k :: upTo k
+  end.
+
+Compute upTo 3.
+
+Lemma or_comm : forall (a b : Prop), a \/ b -> b \/ a.
+Proof.
+intros.
+destruct H as [H1 | H2].
+right.
+exact H1.
+left.
+exact H2.
+Qed.
+
+
 Definition pierce := forall (p q : Prop), ((p -> q) -> p) -> p.
 
 Definition lem := forall (p :Prop), p \/ ~p.
